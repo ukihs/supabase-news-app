@@ -1,0 +1,25 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ยืนยันบัญชีผู้ใช้</title>
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const params = new URLSearchParams(window.location.hash.slice(1));
+      const accessToken = params.get("access_token");
+
+      if (accessToken) {
+        localStorage.setItem("access_token", accessToken);
+        window.location.href = "index.html";
+      } else {
+        document.body.innerHTML = "<h2>ลิงก์หมดอายุหรือไม่ถูกต้อง</h2>";
+      }
+    });
+  </script>
+</head>
+<body>
+  <h2>กำลังยืนยันบัญชี กรุณารอสักครู่...</h2>
+</body>
+</html>
