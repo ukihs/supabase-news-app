@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>หน้าแรก - ข่าวทั้งหมด</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .header-left, .header-right { display: flex; align-items: center; gap: 10px; }
+    .news-card { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 8px; }
+    .news-card img { max-width: 100%; height: auto; margin-top: 8px; }
+    .icon-btn { background: none; border: none; cursor: pointer; font-size: 20px; }
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-content {
+      display: none; position: absolute; right: 0;
+      background-color: #f9f9f9; min-width: 150px; box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+      z-index: 1; border-radius: 5px;
+    }
+    .dropdown-content a {
+      color: black; padding: 8px 12px; text-decoration: none; display: block;
+    }
+    .dropdown-content a:hover { background-color: #f1f1f1 }
+    .dropdown:hover .dropdown-content { display: block; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <h2>📰 ข่าวทั้งหมด</h2>
+    </div>
+    <div class="header-right">
+      
+      <div id="authSection" class="dropdown">
+        <button class="icon-btn">👤</button>
+        <div class="dropdown-content">
+          <a href="auth.html">เข้าสู่ระบบ</a>
+          <a href="auth.html#register">สมัครสมาชิก</a>
+        </div>
+      </div>
+      <div id="userSection" class="dropdown" style="display:none;">
+        <button class="icon-btn">👤</button>
+        <div class="dropdown-content">
+          <a href="my-news.html">ข่าวของฉัน</a>
+          <a href="#" onclick="logout()">ออกจากระบบ</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div id="newsList">Loading...</div>
+
+  <script>
+    const supabase = window.supabase.createClient('https://csrqddcrapehdytwjufk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzcnFkZGNyYXBlaGR5dHdqdWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE1MzE4MzAsImV4cCI6MjA2NzEwNzgzMH0.Xoxk-LQXFhGmjeDQXZOP-8_JH3fIs7YAOjFnB5aPp7c');
+    let currentUser = null;
+
+    async function checkUser() {
+      const { data: userData } = await supabase.auth.getUser();
+      currentUser = userData?.user || null;
+      if (currentUser) {
+        document.getElementById('authSection').style.display = 'none';
+        document.getElementById('userSection').style.display = 'inline-block';
+      } else {
+        document.getElementById('authSection').style.display = 'inline-block';
+        document.getElementById('userSection').style.display = 'none';
+      }
+    }
+
+    async function logout() {
+      await supabase.auth.signOut();
+      location.reload();
+    }
+
+    async function loadNews() {
+      const { data, error } = await supabase.from('news').select('*').order('created_at', { ascending: false });
+      const list = document.getElementById('newsList');
+      if (error || !data.length) {
+        list.innerHTML = "<p>ไม่มีข่าวในระบบ</p>";
+        return;
+      }
+      list.innerHTML = '';
+      data.forEach(news => {
+        list.innerHTML += `
+          <div class="news-card">
+            <h3>${news.title}</h3>
+            <p>${news.content}</p>
+            ${news.image_url ? `<img src="${news.image_url}" alt="ข่าว">` : ''}
+            <small>โพสต์เมื่อ: ${new Date(news.created_at).toLocaleString()}</small>
+          </div>
+        `;
+      });
+    }
+
+    checkUser();
+    loadNews();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script>
+    const supabase = supabase.createClient('https://csrqddcrapehdytwjufk.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzcnFkZGNyYXBlaGR5dHdqdWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE1MzE4MzAsImV4cCI6MjA2NzEwNzgzMH0.Xoxk-LQXFhGmjeDQXZOP-8_JH3fIs7YAOjFnB5aPp7c');
+
+    async function renderAddButton() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const btn = document.createElement('button');
+        btn.textContent = '➕ เพิ่มข่าว';
+        btn.className = 'btn btn-success me-2';
+        btn.onclick = () => window.location.href = 'manage-news.html';
+        document.querySelector('.navbar .ms-auto').prepend(btn);
+      }
+    }
+
+    renderAddButton();
+  </script>
+</body>
+</html>

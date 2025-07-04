@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head><title>ข่าวทั้งหมด</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head>
+<body>
+  <h2>📰 ข่าวล่าสุด</h2>
+  <input type="text" id="searchInput" placeholder="ค้นหาหัวข้อข่าว...">
+  <button onclick="searchNews()">ค้นหา</button><br><br>
+  <div id="newsList">Loading...</div>
+  <script>
+    const supabase = window.supabase.createClient('https://csrqddcrapehdytwjufk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzcnFkZGNyYXBlaGR5dHdqdWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE1MzE4MzAsImV4cCI6MjA2NzEwNzgzMH0.Xoxk-LQXFhGmjeDQXZOP-8_JH3fIs7YAOjFnB5aPp7c');
+    async function searchNews() {
+      const keyword = document.getElementById('searchInput').value;
+      const { data, error } = await supabase.from('news').select('*').ilike('title', `%${keyword}%`).order('created_at', { ascending: false });
+      const container = document.getElementById('newsList');
+      if (error) return container.innerText = '❌ ไม่สามารถโหลดข่าวได้';
+      if (!data.length) return container.innerText = 'ไม่พบข่าว';
+      container.innerHTML = '';
+      data.forEach(n => container.innerHTML += `<h3>${n.title}</h3><p>${n.content}</p>${n.image_url ? `<img src="${n.image_url}" width=200>` : ''}<hr>`);
+    }
+    searchNews();
+  </script>
+</body>
+</html>

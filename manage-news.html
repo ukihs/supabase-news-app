@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>จัดการข่าวของฉัน</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {{ font-family: Arial; margin: 20px; }}
+    input, textarea {{ width: 100%; margin-bottom: 10px; }}
+    button {{ margin-right: 10px; }}
+    .news-item {{ border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }}
+  </style>
+</head>
+<body>
+  <h2>📝 จัดการข่าว</h2>
+  <input type="hidden" id="edit_id">
+  <input type="text" id="title" placeholder="หัวข้อข่าว">
+  <textarea id="content" placeholder="เนื้อหาข่าว"></textarea>
+  <input type="file" id="image"><br>
+  <button onclick="saveNews()">💾 บันทึก</button>
+  <button onclick="clearForm()">🧹 ล้างฟอร์ม</button>
+  <p id="status"></p>
+
+  
+  <div id="myNewsList">Loading...</div>
+
+  <script>
+    const supabase = window.supabase.createClient('https://csrqddcrapehdytwjufk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzcnFkZGNyYXBlaGR5dHdqdWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE1MzE4MzAsImV4cCI6MjA2NzEwNzgzMH0.Xoxk-LQXFhGmjeDQXZOP-8_JH3fIs7YAOjFnB5aPp7c');
+    let currentUserId = null;
+
+    async function init() {{
+      const {{ data: userData }} = await supabase.auth.getUser();
+      if (!userData || !userData.user) {{
+        document.body.innerHTML = "<p>❌ กรุณา login ก่อนใช้งาน</p>";
+        return;
+      }}
+      currentUserId = userData.user.id;
+      
+    const userCheck = await supabase.auth.getUser();
+    if (!userCheck?.data?.user) {
+      document.body.innerHTML = "<p>กรุณาเข้าสู่ระบบเพื่อเพิ่มหรือแก้ไขข่าว</p>";
+      return;
+    }
+
+    loadMyNews();
+ {{
+      const {{ data, error }} = await supabase.from('news').select('*').eq('created_by', currentUserId).order('created_at', {{ ascending: false }});
+      const list = document.getElementById('myNewsList');
+      if (error || !data.length) return list.innerHTML = "<p>ยังไม่มีข่าวของคุณ</p>";
+      list.innerHTML = '';
+      data.forEach(n => list.innerHTML += `
+        <div class="news-item">
+          <h4>${{n.title}}</h4>
+          <p>${{n.content}}</p>
+          ${{n.image_url ? `<img src="${{n.image_url}}" width=200><br>` : ''}}
+          <button onclick='editNews(${JSON.stringify(n)})'>✏️ แก้ไข</button>
+          <button onclick='deleteNews("${n.id}")'>🗑️ ลบ</button>
+        </div>
+      `);
+    }}
+
+    init();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script>
+    const supabase = supabase.createClient('https://csrqddcrapehdytwjufk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzcnFkZGNyYXBlaGR5dHdqdWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE1MzE4MzAsImV4cCI6MjA2NzEwNzgzMH0.Xoxk-LQXFhGmjeDQXZOP-8_JH3fIs7YAOjFnB5aPp7c');
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) {
+        alert("กรุณาเข้าสู่ระบบก่อนใช้งานหน้านี้");
+        window.location.href = "auth.html";
+      }
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script>
+    const supabase = supabase.createClient('https://csrqddcrapehdytwjufk.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzcnFkZGNyYXBlaGR5dHdqdWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE1MzE4MzAsImV4cCI6MjA2NzEwNzgzMH0.Xoxk-LQXFhGmjeDQXZOP-8_JH3fIs7YAOjFnB5aPp7c');
+
+    document.body.style.display = "none"; // ซ่อนทุกอย่างไว้ก่อน
+
+    async function checkLoginStrict() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session || !session.user) {
+        alert("กรุณาเข้าสู่ระบบก่อนเข้าหน้านี้");
+        window.location.href = "auth.html";
+      } else {
+        document.body.style.display = "block"; // แสดงเนื้อหาเมื่อ login แล้ว
+      }
+    }
+
+    checkLoginStrict();
+  </script>
+</body>
+</html>

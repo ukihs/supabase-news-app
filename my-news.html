@@ -1,0 +1,36 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ข่าวของฉัน</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    .news-card { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h2>📋 ข่าวของฉัน</h2>
+  <div id="newsList">Loading...</div>
+  <script>
+    const supabase = window.supabase.createClient('https://csrqddcrapehdytwjufk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzcnFkZGNyYXBlaGR5dHdqdWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE1MzE4MzAsImV4cCI6MjA2NzEwNzgzMH0.Xoxk-LQXFhGmjeDQXZOP-8_JH3fIs7YAOjFnB5aPp7c');
+
+    async function loadMyNews() {
+      const { data: userData } = await supabase.auth.getUser();
+      const user = userData?.user;
+      if (!user) return document.body.innerHTML = "<p>กรุณาเข้าสู่ระบบก่อน</p>";
+      const { data, error } = await supabase.from('news').select('*').eq('created_by', user.id).order('created_at', { ascending: false });
+      const list = document.getElementById('newsList');
+      if (error || !data.length) return list.innerHTML = "<p>ยังไม่มีข่าวของคุณ</p>";
+      list.innerHTML = '';
+      data.forEach(n => list.innerHTML += `
+        <div class="news-card">
+          <h3>${n.title}</h3>
+          <p>${n.content}</p>
+          ${n.image_url ? `<img src="${n.image_url}" width=200>` : ''}
+        </div>`);
+    }
+    loadMyNews();
+  </script>
+</body>
+</html>
