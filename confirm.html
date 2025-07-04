@@ -1,25 +1,35 @@
-
 <!DOCTYPE html>
-<html lang="th">
+<html>
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ยืนยันบัญชีผู้ใช้</title>
-  <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      const params = new URLSearchParams(window.location.hash.slice(1));
-      const accessToken = params.get("access_token");
+  <title>Confirming...</title>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-      if (accessToken) {
-        localStorage.setItem("access_token", accessToken);
-        window.location.href = "index.html";
-      } else {
-        document.body.innerHTML = "<h2>ลิงก์หมดอายุหรือไม่ถูกต้อง</h2>";
-      }
-    });
+    const supabase = createClient(
+      'https://csrqddcrapehdytwjufk.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzcnFkZGNyYXBlaGR5dHdqdWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE1MzE4MzAsImV4cCI6MjA2NzEwNzgzMH0.Xoxk-LQXFhGmjeDQXZOP-8_JH3fIs7YAOjFnB5aPp7c'
+    )
+
+    const hash = window.location.hash.substring(1)
+    const params = new URLSearchParams(hash)
+    const access_token = params.get('access_token')
+    const refresh_token = params.get('refresh_token')
+
+    if (access_token && refresh_token) {
+      await supabase.auth.setSession({
+        access_token,
+        refresh_token
+      })
+
+      // ไปหน้า index หลังล็อกอินสำเร็จ
+      window.location.href = '/supabase-news-app/index.html'
+    } else {
+      document.body.innerHTML = 'Invalid token or expired.'
+    }
   </script>
 </head>
 <body>
-  <h2>กำลังยืนยันบัญชี กรุณารอสักครู่...</h2>
+  กำลังยืนยันบัญชี...
 </body>
 </html>
