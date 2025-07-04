@@ -1,14 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
   <head>
     <meta charset="UTF-8" />
     <title>กำลังยืนยันบัญชี...</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        padding: 3rem;
+      }
+    </style>
     <script type="module">
       import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
       const supabase = createClient(
         'https://csrqddcrapehdytwjufk.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzcnFkZGNyYXBlaGR5dHdqdWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE1MzE4MzAsImV4cCI6MjA2NzEwNzgzMH0.Xoxk-LQXFhGmjeDQXZOP-8_JH3fIs7YAOjFnB5aPp7c'
+        'YOUR_PUBLIC_ANON_KEY' // ใส่ public key จริงของคุณตรงนี้
       )
 
       const hash = window.location.hash.substring(1)
@@ -16,19 +23,21 @@
       const access_token = params.get('access_token')
       const refresh_token = params.get('refresh_token')
 
+      const result = document.getElementById('result')
+
       if (access_token && refresh_token) {
         const { error } = await supabase.auth.setSession({ access_token, refresh_token })
         if (error) {
-          document.body.innerHTML = '❌ เกิดข้อผิดพลาดในการยืนยันบัญชี'
+          result.textContent = '❌ เกิดข้อผิดพลาดในการยืนยันบัญชี'
         } else {
-          document.body.innerHTML = '✅ ยืนยันบัญชีเรียบร้อยแล้ว! <br> <a href="auth.html">เข้าสู่ระบบ</a>'
+          result.innerHTML = '✅ ยืนยันบัญชีเรียบร้อยแล้ว! <br><br><a href="auth.html">เข้าสู่ระบบ</a>'
         }
       } else {
-        document.body.innerHTML = '⛔ ลิงก์ไม่ถูกต้อง หรือหมดอายุ'
+        result.textContent = '⛔ ลิงก์ไม่ถูกต้อง หรือหมดอายุ'
       }
     </script>
   </head>
   <body>
-    <p>กำลังยืนยันบัญชีของคุณ...</p>
+    <p id="result">⏳ กำลังยืนยันบัญชีของคุณ...</p>
   </body>
 </html>
