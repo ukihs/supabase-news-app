@@ -2,34 +2,15 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>กำลังยืนยันบัญชี...</title>
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-
-    const supabase = createClient(
-      'https://csrqddcrapehdytwjufk.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzcnFkZGNyYXBlaGR5dHdqdWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE1MzE4MzAsImV4cCI6MjA2NzEwNzgzMH0.Xoxk-LQXFhGmjeDQXZOP-8_JH3fIs7YAOjFnB5aPp7c'
-    )
-
-    const hash = window.location.hash.substring(1)
-    const params = new URLSearchParams(hash)
-    const access_token = params.get('access_token')
-    const refresh_token = params.get('refresh_token')
-
-    if (access_token && refresh_token) {
-      const { error } = await supabase.auth.setSession({ access_token, refresh_token })
-      if (error) {
-        document.body.innerHTML = 'เกิดข้อผิดพลาดในการตั้งค่า session'
-      } else {
-        // ✅ สำเร็จ: ส่งกลับหน้าเข้าสู่ระบบ
-        window.location.href = 'auth.html'
-      }
-    } else {
-      document.body.innerHTML = 'ลิงก์ไม่ถูกต้อง หรือหมดอายุ'
-    }
-  </script>
+  <title>สมัครสมาชิกสำเร็จ</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 50px; }
+    a { text-decoration: none; color: green; font-weight: bold; }
+  </style>
 </head>
 <body>
-  <p>กำลังยืนยันบัญชีของคุณ...</p>
+  <h2>✅ สมัครสมาชิกสำเร็จแล้ว</h2>
+  <p>กรุณาเข้าสู่ระบบเพื่อเริ่มใช้งาน</p>
+  <a href="auth.html">เข้าสู่ระบบ</a>
 </body>
 </html>
